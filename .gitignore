@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+dist/
+build/
+release_apks/
+.pytest_cache/
+.DS_Store
+node_modules/

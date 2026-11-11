@@ -149,6 +149,9 @@ def _embed_payload_lsb(img: Image.Image, file_header: bytes, lsb_bits: int) -> I
         raise ValueError("Data too large, capacity exceeded. 数据过大，鸭子图容量不够。请使用更小的文件。")
     flat = arr.reshape(-1)
     mask = (1 << lsb_bits) - 1
+    # NumPy 2.x 起 uint8 与负数做按位与会直接抛 OverflowError，这里显式截断到 8 位；
+    # 旧实现用的是 (~mask)（负数），在 numpy>=2 环境下编码会整条流水线崩掉。
+    keep_mask = np.uint8(0xFF & ~mask)
     groups = bit_len // lsb_bits + (1 if bit_len % lsb_bits else 0)
     pad = groups * lsb_bits - bit_len
     if pad:
@@ -160,7 +163,7 @@ def _embed_payload_lsb(img: Image.Image, file_header: bytes, lsb_bits: int) -> I
     if groups > len(idxs):
         raise ValueError("Data too large, capacity exceeded. 数据过大，鸭子图容量不够。请使用更小的文件。")
     sel = idxs[:groups]
-    flat[sel] = (flat[sel] & (~mask)) | vals
+    flat[sel] = (flat[sel] & keep_mask) | vals
     arr = flat.reshape(arr.shape)
     if skip_w > 0 and skip_h > 0:
         src_w = max(0, arr.shape[1] - skip_w)

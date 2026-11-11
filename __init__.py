@@ -24,5 +24,10 @@ except ImportError:
 except Exception as e:
     print(f"❌ SS_tools Import Error (QR): {e}")
 
+# 前端扩展目录（ComfyUI 会把 ./js 挂到 /extensions/SS_tools/ 下）
 WEB_DIRECTORY = "./js"
-__all__ = ["NODE_CLASS_MAPPINGS", "NODE_DISPLAY_NAME_MAPPINGS", "WEB_DIRECTORY"]
+
+# 版本号：与 pyproject.toml / CHANGELOG.md / git tag 保持一致
+__version__ = "1.3.0"
+
+__all__ = ["NODE_CLASS_MAPPINGS", "NODE_DISPLAY_NAME_MAPPINGS", "WEB_DIRECTORY", "__version__"]

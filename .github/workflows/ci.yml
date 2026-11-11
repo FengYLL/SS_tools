@@ -1,0 +1,56 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  python-tests:
+    name: python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: 安装测试依赖
+        run: python -m pip install --upgrade pip numpy pillow
+      - name: 负载往返 + 节点注册测试
+        run: python -m unittest discover -v
+
+  js-tests:
+    name: web-extension
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: 前端扩展 harness
+        run: node --test tests/js/duck_tutorial.test.mjs
+
+  package-dry-run:
+    name: package-dry-run
+    runs-on: ubuntu-latest
+    needs: [python-tests, js-tests]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: 打包
+        run: python scripts/build_release.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SS_tools-dry-run
+          path: dist/*
+          retention-days: 7

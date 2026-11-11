@@ -4,7 +4,9 @@
   <a href="README.en.md">🇬🇧 English</a>
 </div>
 
-# Super-SecureMediaProtection鸭鸭图媒体内容保护 V1.2
+# Super-SecureMediaProtection鸭鸭图媒体内容保护 V1.3
+
+> 本版重点更新 ComfyUI 前端入口与发布流水线，详见 [CHANGELOG.md](CHANGELOG.md)。
 
 声明：
 本项目初衷是提供一种有趣的文件打包方式，隐写算法和加密算法全部开源源码。

@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ss-tools"
+version = "1.3.0"
+description = "Super-SecureMediaProtection 鸭鸭图媒体内容保护 - ComfyUI 节点与本地工具"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "GPL-3.0" }
+authors = [{ name = "copyangle" }]
+dependencies = [
+    "numpy>=1.26",
+    "pillow>=10.0",
+    "moviepy>=2.0",
+    "opencv-python>=4.8",
+    "soundfile>=0.12",
+    "imageio-ffmpeg>=0.4",
+    "qrcode>=7.4",
+    "pycryptodome>=3.19",
+]
+
+[project.urls]
+Homepage = "https://github.com/copyangle/SS_tools"
+Changelog = "https://github.com/copyangle/SS_tools/blob/main/CHANGELOG.md"
+
+[tool.setuptools]
+py-modules = ["duck_encode_node", "duck_decode_node", "duck_payload_exporter", "duck_qr_encoder_node"]

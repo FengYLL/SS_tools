@@ -1,0 +1,96 @@
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "版本号（不带 v，例如 1.3.0，需与 pyproject.toml 一致）"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  python-tests:
+    name: python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: 安装测试依赖
+        run: python -m pip install --upgrade pip numpy pillow
+      - name: 负载往返 + 节点注册测试
+        run: python -m unittest discover -v
+
+  js-tests:
+    name: web-extension
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: 前端扩展 harness
+        run: node --test tests/js/duck_tutorial.test.mjs
+
+  build:
+    name: build-package
+    runs-on: ubuntu-latest
+    needs: [python-tests, js-tests]
+    outputs:
+      version: ${{ steps.version.outputs.value }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: 解析版本号
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "value=${{ inputs.version }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "value=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+          fi
+      - name: 打包（含版本一致性校验）
+        run: python scripts/build_release.py --expect-version "${{ steps.version.outputs.value }}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ss-tools-release
+          path: |
+            dist/SS_tools-v*.zip
+            dist/SHA256SUMS
+            dist/release_notes.md
+          if-no-files-found: error
+          retention-days: 14
+
+  publish:
+    name: publish-release
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: ss-tools-release
+          path: dist
+      - name: 发布 GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ needs.build.outputs.version }}
+          name: SS_tools v${{ needs.build.outputs.version }}
+          body_path: dist/release_notes.md
+          files: |
+            dist/SS_tools-v*.zip
+            dist/SHA256SUMS
+          fail_on_unmatched_files: true
+          draft: false
+          prerelease: false
