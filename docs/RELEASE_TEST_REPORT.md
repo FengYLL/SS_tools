@@ -85,3 +85,16 @@ node --test tests/js/duck_tutorial.test.mjs
 # 打包
 python scripts/build_release.py --expect-version 1.3.0
 ```
+
+## 6. 发布结果（GitHub Actions）
+
+| 项 | 值 |
+| --- | --- |
+| 仓库 | https://github.com/FengYLL/SS_tools（上游 copyangle/SS_tools 的 fork，上游无写权限） |
+| 工作流 | `release`（tag `v1.3.0` 触发）/ Run [43060935781](https://github.com/FengYLL/SS_tools/actions/runs/43060935781) |
+| 结论 | success（python 3.10 / python 3.12 / web-extension / build-package / publish-release 全绿） |
+| Release | https://github.com/FengYLL/SS_tools/releases/tag/v1.3.0 |
+| 资产 | `SS_tools-v1.3.0.zip`（172,546,626 B）、`SHA256SUMS` |
+| CI 流水线 | `ci` Run [43060888320](https://github.com/FengYLL/SS_tools/actions/runs/43060888320) 全绿 |
+
+发布资产里的 `SHA256SUMS` 是本次 CI 构建的权威校验值：zip 会写入构建机上的文件时间戳，所以本地重打包的哈希与 CI 产物不同，但包内每个文件的 SHA256 与 tag 内容一致。
