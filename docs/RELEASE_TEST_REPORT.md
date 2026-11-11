@@ -66,9 +66,14 @@ node --test tests/js/duck_tutorial.test.mjs
 
 ```
 $ python scripts/build_release.py --expect-version 1.3.0
-打包完成: SS_tools-v1.3.0.zip (31 个文件, 164.6 MB)
-SHA256: df63b03c9398087d613474bcd676954ebdb38a3743489aa2c5f5f1bfd27d5090
+打包完成: SS_tools-v1.3.0.zip (32 个文件, 164.6 MB)
 ```
+
+zip 会写入构建机上的文件时间戳，所以本地重打包和 CI 产物的整体哈希不同；**以 Release 里的
+`SHA256SUMS` 为准**（v1.3.0 发布件：`44f3d71e8b249ecd0e2bc923a5a81a7f8f3ec4f20c069da4df7bb05f6a3ccced`）。
+
+已实测校验：把发布件下载回来逐个比对 32 个条目的 SHA256，31 个与 tag 内容完全一致，
+唯一差异是本报告在发版后追加的「发布结果」章节——即发布件确实等于 `v1.3.0` tag 的内容。
 
 ## 5. 复现命令
 
